@@ -27,6 +27,8 @@ using QuantConnect.Logging;
 using QuantConnect.Packets;
 using QuantConnect.Util;
 
+using AIStockAnalyzer;
+
 namespace QuantConnect.Lean.Launcher
 {
     public class Program

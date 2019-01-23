@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using QuantConnect;
@@ -11,6 +12,7 @@ using QuantConnect.Data.Market;
 using QuantConnect.Algorithm;
 using QuantConnect.Indicators;
 using QuantConnect.Securities;
+using System.Windows;
 
 namespace AIStockAnalyzer
 {
@@ -24,6 +26,20 @@ namespace AIStockAnalyzer
     {
         private readonly Symbol _ibm = QuantConnect.Symbol.Create("IBM", SecurityType.Equity, Market.USA);
         private readonly Symbol _spy = QuantConnect.Symbol.Create("SPY", SecurityType.Equity, Market.USA);
+
+        public AIStockStrategy()
+        {
+            Thread thread = new Thread(() =>
+            {
+                //...create UI controls...
+                Window wnd = new Window();
+                wnd.Content = new ChartControl();
+                wnd.ShowDialog();
+            });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            
+        }
 
         /// <summary>
         /// Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.
@@ -71,7 +87,7 @@ namespace AIStockAnalyzer
 
         public void AddData(TradeBar data)
         {
-            
+
         }
     }
 }
