@@ -22,7 +22,7 @@
             <wpf:CartesianChart.AxisY>
                 <wpf:AxesCollection>
                     <wpf:Axis />
-                    <wpf:Axis />
+                    <wpf:Axis MinValue="0" Title="Wolumen" />
                 </wpf:AxesCollection>
             </wpf:CartesianChart.AxisY>
         </wpf:CartesianChart>
