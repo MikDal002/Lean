@@ -18,6 +18,7 @@ using LiveCharts;
 using LiveCharts.Defaults;
 using LiveCharts.Wpf;
 using QuantConnect.Data.Market;
+using VerticalAlignment = System.Windows.VerticalAlignment;
 
 namespace AIStockAnalyzer
 {
@@ -26,13 +27,13 @@ namespace AIStockAnalyzer
     /// </summary>
     public partial class ChartControl : UserControl, INotifyPropertyChanged
     {
-        private string[] _labels;
+        private List<string> _labels = new List<string>();
         ChartValues<OhlcPoint> StockValues = new ChartValues<OhlcPoint>();
         ChartValues<double> StockVolumen = new ChartValues<double>();
         public ChartControl()
         {
             InitializeComponent();
-            
+
             var ohlcSeries = new OhlcSeries()
             {
                 Values = StockValues,
@@ -49,19 +50,11 @@ namespace AIStockAnalyzer
             SeriesCollection.Add(ohlcSeries);
             SeriesCollection.Add(volumentSeries);
 
-            //Labels = new[]
-            //{
-            //    DateTime.Now.ToString("dd MMM"),
-            //    DateTime.Now.AddDays(1).ToString("dd MMM"),
-            //    DateTime.Now.AddDays(2).ToString("dd MMM"),
-            //    DateTime.Now.AddDays(3).ToString("dd MMM"),
-            //    DateTime.Now.AddDays(4).ToString("dd MMM"),
-            //};
             DataContext = this;
         }
 
         public SeriesCollection SeriesCollection { get; private set; }
-        public string[] Labels
+        public List<string> Labels
         {
             get { return _labels; }
             set
@@ -89,33 +82,68 @@ namespace AIStockAnalyzer
             if (PropertyChanged != null) PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public void AddDataWithDispatcher(Bar bar, double volume)
-        {
-            AddDataWithDispatcher(
-                (double)bar.Open,
-                (double)bar.High,
-                (double)bar.Low,
-                (double)bar.Close,
-                (double)volume);
-        }
-
         public void AddDataWithDispatcher(TradeBar tradeBar)
         {
             AddDataWithDispatcher(
-                (double) tradeBar.Open,
-                (double) tradeBar.High,
-                (double) tradeBar.Low,
-                (double) tradeBar.Close,
-                (double) tradeBar.Volume);
+                (double)tradeBar.Open,
+                (double)tradeBar.High,
+                (double)tradeBar.Low,
+                (double)tradeBar.Close,
+                (double)tradeBar.Volume,
+                tradeBar.EndTime);
         }
 
-        private void AddDataWithDispatcher(double open, double high, double low, double close, double volume)
+        private void AddDataWithDispatcher(double open, double high, double low, double close, double volume, DateTime date)
         {
             Dispatcher.Invoke(
                 () =>
                 {
                     StockValues.Add(new OhlcPoint(open, high, low, close));
                     StockVolumen.Add(volume);
+                    Labels.Add(date.ToShortDateString());
+                });
+        }
+
+        public void SetMarkOnChart(TradeBar tradeBar, int value)
+        {
+            Dispatcher.Invoke(
+                () =>
+                {
+                    Chart.VisualElements.Add(new VisualElement
+                    {
+                        AxisY = 2,
+                        // tak aby wyświetliło sie nad ostatnią testowaną próbką 
+                        X = StockValues.Count - value - 1,
+                        Y = value,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        UIElement = new TextBlock
+                        {
+                            Text = $"{value}",
+                            FontWeight = FontWeights.Bold,
+                            FontSize = 16
+                        }
+                    });
+
+                    // zaznaczamy próbki poddane analizie
+                    for (int i = value - 1; i > 0; i--)
+                    {
+                        Chart.VisualElements.Add(new VisualElement
+                        {
+                            AxisY = 2,
+                            // tak aby wyświetliło sie nad ostatnią testowaną próbką 
+                            X = StockValues.Count - value - 1 - i,
+                            Y = value,
+                            HorizontalAlignment = HorizontalAlignment.Center,
+                            VerticalAlignment = VerticalAlignment.Center,
+                            UIElement = new TextBlock
+                            {
+                                Text = "–",
+                                FontWeight = FontWeights.Bold,
+                                FontSize = 16
+                            }
+                        });
+                    }
                 });
         }
     }

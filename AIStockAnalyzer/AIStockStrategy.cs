@@ -38,7 +38,7 @@ namespace AIStockAnalyzer
             });
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
-            
+
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace AIStockAnalyzer
             //SetEndDate(2018, 01, 01);    //Set End Date
 
             SetStartDate(new DateTime(2014, 05, 1));
-            SetEndDate(new DateTime(2015, 05, 1));
+            SetEndDate(new DateTime(2015, 10, 1));
             SetCash(100000);             //Set Strategy Cash
 
             // Find more symbols here: http://quantconnect.com/data
@@ -65,11 +65,28 @@ namespace AIStockAnalyzer
             //Securities[_ibm].SetLeverage(1.0m);
         }
 
+        AIPreparer dbl = new AIPreparer(2, "2.json");
+        AIPreparer triple = new AIPreparer(3, "3.json");
+        AIPreparer fifths = new AIPreparer(5, "5.json");
+        AIPreparer eights = new AIPreparer(8, "8.json");
+        AIPreparer thirteens = new AIPreparer(13, "13.json");
+
         public void OnData(TradeBars data)
         {
             var goo = data["aapl"];
             //TradeBar current = data["XAUUSD"];
             _chart.AddDataWithDispatcher(goo);
+
+            if (dbl.AddToAnalyze(goo))
+                _chart.SetMarkOnChart(goo, dbl.Count);
+            if (triple.AddToAnalyze(goo))
+                _chart.SetMarkOnChart(goo, triple.Count);
+            if (fifths.AddToAnalyze(goo))
+                _chart.SetMarkOnChart(goo, fifths.Count);
+            if (eights.AddToAnalyze(goo))
+                _chart.SetMarkOnChart(goo, eights.Count);
+            if (thirteens.AddToAnalyze(goo))
+                _chart.SetMarkOnChart(goo, thirteens.Count);
         }
 
 

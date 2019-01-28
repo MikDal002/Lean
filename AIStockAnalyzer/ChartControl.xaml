@@ -15,7 +15,7 @@
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <Button Grid.Row="1" Click="UpdateAllOnClick">Update Open and Close</Button>
-        <wpf:CartesianChart Grid.Row="2" Series="{Binding SeriesCollection}">
+        <wpf:CartesianChart x:Name="Chart"  Grid.Row="2" Series="{Binding SeriesCollection}">
             <wpf:CartesianChart.AxisX>
                 <wpf:Axis Labels="{Binding Labels}"/>
             </wpf:CartesianChart.AxisX>
@@ -23,6 +23,7 @@
                 <wpf:AxesCollection>
                     <wpf:Axis />
                     <wpf:Axis MinValue="0" Title="Wolumen" />
+                    <wpf:Axis MinValue="0" MaxValue="15" Title="AI" />
                 </wpf:AxesCollection>
             </wpf:CartesianChart.AxisY>
         </wpf:CartesianChart>
