@@ -13,6 +13,7 @@ using QuantConnect.Algorithm;
 using QuantConnect.Indicators;
 using QuantConnect.Securities;
 using System.Windows;
+using QuantConnect.Data;
 
 namespace AIStockAnalyzer
 {
@@ -24,16 +25,15 @@ namespace AIStockAnalyzer
     /// <meta name="tag" content="trading and orders" />
     public class AIStockStrategy : QCAlgorithm
     {
-        private readonly Symbol _ibm = QuantConnect.Symbol.Create("IBM", SecurityType.Equity, Market.USA);
-        private readonly Symbol _spy = QuantConnect.Symbol.Create("SPY", SecurityType.Equity, Market.USA);
-
+        private readonly Symbol _ibm = QuantConnect.Symbol.Create("aapl", SecurityType.Forex, Market.USA);
+        private ChartControl _chart;
         public AIStockStrategy()
         {
             Thread thread = new Thread(() =>
             {
                 //...create UI controls...
                 Window wnd = new Window();
-                wnd.Content = new ChartControl();
+                wnd.Content = _chart = new ChartControl();
                 wnd.ShowDialog();
             });
             thread.SetApartmentState(ApartmentState.STA);
@@ -49,14 +49,14 @@ namespace AIStockAnalyzer
             //SetStartDate(2006, 01, 01);  //Set Start Date
             //SetEndDate(2018, 01, 01);    //Set End Date
 
-            SetStartDate(DateTime.Now.Subtract(TimeSpan.FromDays(30)));
-            SetEndDate(DateTime.Now);
+            SetStartDate(new DateTime(2014, 05, 1));
+            SetEndDate(new DateTime(2015, 05, 1));
             SetCash(100000);             //Set Strategy Cash
 
             // Find more symbols here: http://quantconnect.com/data
             //AddSecurity(SecurityType.Equity, "IBM", Resolution.Hour);
             //AddSecurity(SecurityType.Equity, "SPY", Resolution.Daily);
-            AddCfd("XAUGBP", Resolution.Daily, Market.Oanda);
+            AddEquity("aapl", Resolution.Daily);
 
 
             //_macd = MACD(_spy, 12, 26, 9, MovingAverageType.Wilders, Resolution.Daily, Field.Close);
@@ -65,13 +65,21 @@ namespace AIStockAnalyzer
             //Securities[_ibm].SetLeverage(1.0m);
         }
 
+        public void OnData(TradeBars data)
+        {
+            var goo = data["aapl"];
+            //TradeBar current = data["XAUUSD"];
+            _chart.AddDataWithDispatcher(goo);
+        }
+
+
         /// <summary>
         /// OnData event is the primary entry point for your algorithm. Each new data point will be pumped in here.
         /// </summary>
         /// <param name="data">TradeBars IDictionary object with your stock data</param>
-        public void OnData(TradeBars data)
+        public override void OnData(Slice data)
         {
-            TradeBar current = data["XAUGPB"];
+            System.Diagnostics.Debug.WriteLine("OOOO!");
 
         }
     }
